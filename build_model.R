@@ -8,25 +8,22 @@ library(scales)
 library(stringr)
 library(tidytext)
 
+# twitter API keys used
+source("keys.R")
 
 # Constants ---------------------------------------------------------------
 
 START_DATE <- as.Date("2016-01-09")
-
-key1 <- "oM1hgqPFxQaK15pIcSmMdvX53"
-key2 <- "jXqFrTeOyXYRHHI75wsynSFs4yC3NNIpZCtdo4CH07RYp2ufA7"
-key3 <- "236160526-P0mC2y1EgprUFwPPKBWNmaLoNOA1RVyTUVu65ebo"
-key4 <- "5vWAvb3fsCSzGVsENYIDZ3dhfCYTv4FZwDcMMqdkfx3R8"
 
 EMOTIONS <- c("trust", "fear", "negative", "sadness", "anger", "surprise", "positive", "disgust", "joy", "anticipation")
 
 # Functions ---------------------------------------------------------------
 
 loadTweets <- function(start.date) {
-  setup_twitter_oauth(key1,
-                      key2,
-                      key3,
-                      key4)
+  setup_twitter_oauth(twitter_consumer,
+                      twitter_consumer_secret,
+                      twitter_access_token,
+                      twitter_access_secret)
   
   out <- tryCatch({
     load("trump_tweets.Rdata")
@@ -66,7 +63,7 @@ tweets <- trump.tweets %>%
   mutate(hour = hour(with_tz(created, "EST")), tweet.date = date(created)) %>%
   select(id, text, source, favoriteCount, retweetCount, isRetweet, created, tweet.date, hour)
 
-# has.quotes indicates a tweet wrapped in quotation marks (seems to be a thing he does)
+# has.quotes indicates a tweet wrapped in quotation marks 
 tweets$has.quotes <- ifelse(str_detect(tweets$text, '^"'), 1, 0)
 
 # was a picture or link included?
