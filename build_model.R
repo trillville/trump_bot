@@ -7,6 +7,7 @@ library(lubridate)
 library(scales)
 library(stringr)
 library(tidytext)
+library(matrixStats)
 
 # twitter API keys used
 source("keys.R")
@@ -64,7 +65,7 @@ tweets <- trump.tweets %>%
   select(id, text, source, favoriteCount, retweetCount, isRetweet, created, tweet.date, hour)
 
 # has.quotes indicates a tweet wrapped in quotation marks 
-tweets$has.quotes <- ifelse(str_detect(tweets$text, '^"'), 1, 0)
+tweets$has.quotes <- ifelse(str_detect(tweets$text, c('^"')), 1, 0)
 
 # was a picture or link included?
 tweets$has.pic.link <- ifelse(str_detect(tweets$text, "t.co"), 1, 0)
@@ -102,3 +103,66 @@ sentiment.table <- left_join(sentiment.table, nrc,
 
 tweets <- left_join(tweets, sentiment.table)
 tweets[, EMOTIONS] <- apply(tweets[, EMOTIONS], 2, function(x) {replace(x, is.na(x), 0)})
+
+tweets$total.emotion <- rowSums(tweets[, EMOTIONS])
+
+# Modeling -------------------------------------------------------------------
+
+tweets <- tweets[complete.cases(tweets), ]
+tweets$trump <- as.factor(ifelse(tweets$source == "Android", 1, 0))
+x.vars <- as.matrix(select(tweets, hour, has.quotes, has.pic.link, trust, fear, negative, sadness, 
+                          anger, surprise, positive, disgust, joy, anticipation))
+train <- sample(nrow(tweets), nrow(tweets)/2)
+
+# TODO - replace with actual manual training results
+y.var <- tweets$trump
+
+# LOGISTIC REGRESSION
+model1 <- glm(trump ~ hour + has.quotes + has.pic.link + trust + fear + negative + 
+                sadness + anger + surprise + positive + disgust + joy + anticipation, 
+              family = binomial(),
+              data = tweets)
+
+# Unused Models -----------------------------------------------------------
+
+# # XGBOOST
+# library(xgboost)
+# xgb.x <- as.matrix(select(tweets, hour, has.quotes, has.pic.link, trust, fear, negative, sadness, 
+#                 anger, surprise, positive, disgust, joy, anticipation))
+# xgb.y <- tweets$trump
+# 
+# model3 <- xgboost(data = xgb.x[train, ], label = xgb.y[train], objective = "binary:logistic", eta = 0.01, nrounds = 1000)
+# probs2 <- predict(model3, xgb.x[-train, ])
+
+
+# RIDGE
+# cv2 <- cv.glmnet(x = xgb.x[train, ], y = xgb.y[train], type.measure = "class", family = "binomial", alpha = 0)
+# model5 <- glmnet(x = xgb.x[train, ], y = xgb.y[train], family = "binomial", alpha = 0, lambda = 0.06273243)
+# probs <- predict(model5, xgb.x[-train, ], type = "response")
+# preds <- ifelse(probs > 0.5, 1, 0)
+
+# RANDOMFOREST
+# library(randomForest)
+# model2 <- randomForest(x = x.vars[train, ], y = y.var[train], xtest = x.vars[-train, ], ytest = y.var[-train])
+# 
+# preds <- model2$votes[, 2]
+# table(preds, tweets$trump[-train])
+# 
+# 
+# # LASSO
+# library(glmnet)
+# #cv1 <- cv.glmnet(x = xgb.x[train, ], y = xgb.y[train], type.measure = "class", family = "binomial", alpha = 1)
+# model3 <- glmnet(x = x.vars[train, ], y = y.var[train], family = "binomial", alpha = 1, lambda = 0.02911781)
+# 
+# probs1 <- predict(model1, tweets[-train, ], type = "response")
+# probs2 <- model2$votes[, 2]
+# probs3 <- predict(model3, x.vars[-train, ], type = "response")
+# 
+# all.probs <- cbind(probs1, probs2, probs3)
+# 
+# # geometric mean
+# probs <- rowProds(all.probs)^(1/ncol(all.probs))
+# probs <- rowMeans(all.probs)
+# preds <- ifelse(probs > 0.5, 1, 0)
+# table(preds, y.var[-train])
+
