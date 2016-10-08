@@ -110,6 +110,7 @@ tweets$total.emotion <- rowSums(tweets[, EMOTIONS])
 
 tweets <- tweets[complete.cases(tweets), ]
 tweets$trump <- as.factor(ifelse(tweets$source == "Android", 1, 0))
+tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
 x.vars <- as.matrix(select(tweets, hour, has.quotes, has.pic.link, trust, fear, negative, sadness, 
                           anger, surprise, positive, disgust, joy, anticipation))
 train <- sample(nrow(tweets), nrow(tweets)/2)
@@ -118,10 +119,14 @@ train <- sample(nrow(tweets), nrow(tweets)/2)
 y.var <- tweets$trump
 
 # LOGISTIC REGRESSION
-model1 <- glm(trump ~ hour + has.quotes + has.pic.link + trust + fear + negative + 
+model1 <- glm(trump ~ hour + has.pic.link + trust + fear + negative + 
                 sadness + anger + surprise + positive + disgust + joy + anticipation, 
               family = binomial(),
               data = tweets)
+
+probs <- predict(model1, tweets[-train, ], type = "response")
+preds <- ifelse(probs > 0.5, 1, 0)
+table(preds, y.var[-train])
 
 # Unused Models -----------------------------------------------------------
 
