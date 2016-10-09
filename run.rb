@@ -9,17 +9,26 @@ class TrumpTweet < ActiveRecord::Base
     (prediction.to_f * 100).round
   end
 
+  def message
+    @message ||= ["@realDonaldTrump probably",
+      (percentage <= 50 ? "didn't" : "did"),
+      "tweet this,",
+      ("only" if percentage <= 50),
+      "#{percentage}%".with_indefinite_article,
+      "chance that it was him!",
+      (percentage <= 50 ? ["Sad!", "Low Energy!"].sample : ["Tremendous!", "High Energy!"].sample)
+    ].compact.join(" ")
+  end
+
   private
 
   def publish_tweet
     return if rt_twitter_id || !twitter_id.present? || !prediction.present?
 
     puts "\n\nPOSTING TO TWITTER!"
+    puts message
 
-    msg = "#{percentage}% chance @realDonaldTrump himself wrote this"
-    puts msg
-
-    rt = $twitter.update(msg, in_reply_to_status_id: twitter_id)
+    rt = $twitter.update(message, in_reply_to_status_id: twitter_id)
     update_attributes!(rt_twitter_id: rt.id)
   end
 end
