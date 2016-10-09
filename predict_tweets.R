@@ -11,3 +11,4 @@ last.id <- "784216198259085312"
 predictions <- predictTweets(last.id)
 
 write.csv(predictions, "predictions.csv")
+
