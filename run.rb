@@ -19,7 +19,7 @@ class TrumpTweet < ActiveRecord::Base
 
   def publish_tweet
     retweet.delete if rt_twitter_id.present?
-    rt = original_tweet.retweet("#{percentage}% chance Trump himself wrote this:")
+    rt = original_tweet.retweet("#{percentage}% chance @realDonaldTrump himself wrote this")
     update_attributes!(rt_twitter_id: rt.id)
   end
 end
