@@ -2,10 +2,10 @@
 # Load all tweets and update local data file ------------------------------------------------------------------------
 
 loadAllTweets <- function(start.date) {
-  setup_twitter_oauth(twitter_consumer,
-                      twitter_consumer_secret,
-                      twitter_access_token,
-                      twitter_access_secret)
+  setup_twitter_oauth(Sys.getenv("TWITTER_CONSUMER"),
+                      Sys.getenv("TWITTER_CONSUMER_SECRET"),
+                      Sys.getenv("TWITTER_ACCCESS_TOKEN"),
+                      Sys.getenv("TWITTER_ACCCESS_TOKEN_SECRET"))
   
   out <- tryCatch({
     load("trump_tweets.Rdata")
