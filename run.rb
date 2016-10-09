@@ -1,7 +1,9 @@
+require "csv"
+
 Bundler.require
 
 class TrumpTweet < ActiveRecord::Base
-  after_save :publish_tweet, if: -> { prediction.present? && !rt_twitter_id.present? }
+  after_save :publish_tweet
 
   def percentage
     (prediction.to_f * 100).round
@@ -10,6 +12,8 @@ class TrumpTweet < ActiveRecord::Base
   private
 
   def publish_tweet
+    return if rt_twitter_id || !twitter_id.present? || !prediction.present?
+
     rt = $twitter.update("#{percentage}% chance @realDonaldTrump himself wrote this", in_reply_to_status_id: twitter_id)
     update_attributes!(rt_twitter_id: rt.id)
   end
@@ -28,5 +32,5 @@ r_script = %x[which Rscript].chomp
 predictions_csv = %x[#{r_script} --vanilla #{File.expand_path("predict_tweets.R", __FILE__)} #{TrumpTweet.last.twitter_id}]
 
 CSV.parse(predictions_csv.split("\n")[1..-1].join("\n"), headers: true).each do |row|
-  TrumpTweet.find_or_initialize_by(twitter_id: row["id"]).update_attributes!(prediction: "prediction")
+  TrumpTweet.find_or_initialize_by(twitter_id: row["id"]).update_attributes!(prediction: row["prediction"])
 end
