@@ -31,3 +31,45 @@ table(preds, all$Trump[-train])
 
 t2 <- select(tweets, id, text, trump)
 write.csv(t2, "all.tweets.csv")
+
+t1 <- read_csv("C:/Users/tillm/OneDrive/Documents/twitter_bot/training/completed.csv")
+test <- left_join(t1, t2,
+                  by = c("text" = "text"))
+
+a1 <- read_csv("C:/Users/tillm/OneDrive/Documents/twitter_bot/training/classified.csv")
+trump <- a1$trump
+
+tweets <- select(tweets, -trump)
+tweets <- tweets[1:1605, ]
+tweets <- cbind(tweets, trump)
+
+x.vars <- as.matrix(select(tweets, hour, has.quotes, has.pic.link, trust, fear, negative, sadness, 
+                           anger, surprise, positive, disgust, joy, anticipation))
+train <- sample(nrow(tweets), nrow(tweets)/2)
+
+# TODO - replace with actual manual training results
+y.var <- tweets$trump
+
+# LOGISTIC REGRESSION
+model1 <- glm(trump ~ hour + has.pic.link + negative + disgust, 
+              family = binomial(),
+              data = tweets[train,])
+
+model1 <- bestglm(Xy = tmp[train, ], family = binomial(), IC = "BIC")
+
+probs <- predict(model1, tweets[-train, ], type = "response")
+preds <- ifelse(probs > 0.5, 1, 0)
+table(preds, y.var[-train])
+
+
+
+
+
+
+
+
+tmp <- tweets
+tmp <- rename(tmp, y = trump) %>%
+  select(hour, has.pic.link, trust, fear, negative, sadness, anger, surprise, positive, disgust, joy, anticipation, y)
+
+model1 <- bestglm(Xy = tmp[train, ], family = binomial(), IC = "BIC")
