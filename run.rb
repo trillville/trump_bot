@@ -16,7 +16,7 @@ class TrumpTweet < ActiveRecord::Base
       ("only" if percentage <= 50),
       "#{percentage}%".with_indefinite_article,
       "chance that it was him!",
-      (percentage <= 50 ? ["Sad!", "Low Energy!"].sample : ["Tremendous!", "High Energy!"].sample)
+      (percentage <= 50 ? ["Sad!", "Low Energy!", "Phony!"].sample : ["Tremendous!", "High Energy!", "Big League!"].sample)
     ].compact.join(" ")
   end
 
