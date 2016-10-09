@@ -1,3 +1,5 @@
+Bundler.require
+
 class TrumpTweet < ActiveRecord::Base
   after_save :publish_tweet, if: -> (t) { prediction.present? && !rt_twitter_id.present? }
 
@@ -32,7 +34,7 @@ $twitter = Twitter::REST::Client.new do |config|
 end
 
 r_script = %x[which Rscript].chomp
-predictions_csv = %x[#{r_script} --vanilla #{File.expand_path("predict.R", __FILE__)} #{TrumpTweet.last.twitter_id}]
+predictions_csv = %x[#{r_script} --vanilla #{File.expand_path("predict_tweets.R", __FILE__)} #{TrumpTweet.last.twitter_id}]
 
 CSV.parse(predictions_csv, headers: true).each do |row|
   TrumpTweet.find_or_initialize_by(twitter_id: row["id"]).update_attributes!(prediction: "prediction")
