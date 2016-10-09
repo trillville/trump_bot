@@ -94,7 +94,7 @@ addFeatures <- function(df) {
 
 # Make Predictions for all tweets since last.id ---------------------------
 
-predictTweets(last.id) {
+predictTweets <- function(last.id) {
   tweets <- tbl_df(map_df(userTimeline("realDonaldTrump", n = 50, sinceID = last.id), as.data.frame))
   tweets <- addFeatures(tweets)
   load("model.Rdata") # load model1

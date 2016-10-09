@@ -9,4 +9,4 @@ setup_twitter_oauth(twitter_consumer,
 
 predictions <- predictTweets(last.id)
 
-
+write.csv(predictions, "predictions.csv")
