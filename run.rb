@@ -14,8 +14,8 @@ class TrumpTweet < ActiveRecord::Base
       (percentage <= 50 ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight"].sample
                           : ["Tremendous", "High Energy", "Big League"].sample),
       "@realDonaldTrump probably",
-      (percentage <= 50 ? "didn't" : "did"),
-      "write this,",
+      (percentage <= 50 ? "didn't write" : "wrote"),
+      "this,",
       ("only" if percentage <= 50),
       "#{percentage}%".with_indefinite_article,
       "chance that it was him!",
