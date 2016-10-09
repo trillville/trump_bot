@@ -47,6 +47,8 @@ GEM
     http-form_data (1.0.1)
     http_parser.rb (0.6.0)
     i18n (0.7.0)
+    indefinite_article (0.2.4)
+      activesupport
     json (1.8.3)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
@@ -105,9 +107,13 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 4.2)
+  indefinite_article
   pg
   standalone_migrations
   twitter
+
+RUBY VERSION
+   ruby 2.3.1p112
 
 BUNDLED WITH
    1.13.2
