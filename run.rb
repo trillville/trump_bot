@@ -11,8 +11,8 @@ class TrumpTweet < ActiveRecord::Base
 
   def message
     @message ||= [
-      (percentage <= 50 ? ["Low Energy!", "Phony!", "Dopey", "Neurotic", "Lightweight"].sample
-                          : ["Tremendous!", "High Energy!", "Big League!"].sample),
+      (percentage <= 50 ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight"].sample
+                          : ["Tremendous", "High Energy", "Big League"].sample),
       "@realDonaldTrump probably",
       (percentage <= 50 ? "didn't" : "did"),
       "write this,",
