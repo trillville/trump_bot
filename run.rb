@@ -32,5 +32,6 @@ r_script = %x[which Rscript].chomp
 predictions_csv = %x[#{r_script} --vanilla #{File.expand_path("predict_tweets.R", __FILE__)} #{TrumpTweet.last.twitter_id}]
 
 CSV.parse(predictions_csv.split("\n")[1..-1].join("\n"), headers: true).each do |row|
+  puts "predicted: #{row["id"]} has probability: #{row["prediction"]}"
   TrumpTweet.find_or_initialize_by(twitter_id: row["id"]).update_attributes!(prediction: row["prediction"])
 end
