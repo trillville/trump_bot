@@ -1,6 +1,5 @@
 source("libs_constants.R")
 source("functions.R")
-source("keys.R")
 
 setup_twitter_oauth(Sys.getenv("TWITTER_CONSUMER"),
                     Sys.getenv("TWITTER_CONSUMER_SECRET"),
