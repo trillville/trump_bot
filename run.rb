@@ -11,13 +11,16 @@ class TrumpTweet < ActiveRecord::Base
 
   def message
     @message ||= [
-      (percentage <= 50 ? ["Sad!", "Low Energy!", "Phony!"].sample : ["Tremendous!", "High Energy!", "Big League!"].sample),
+      (percentage <= 50 ? ["Low Energy!", "Phony!", "Dopey", "Neurotic", "Lightweight"].sample
+                          : ["Tremendous!", "High Energy!", "Big League!"].sample),
       "@realDonaldTrump probably",
       (percentage <= 50 ? "didn't" : "did"),
       "write this,",
       ("only" if percentage <= 50),
       "#{percentage}%".with_indefinite_article,
       "chance that it was him!",
+      (percentage <= 50 ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
+                          : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
       original_tweet.url
     ].compact.join(" ")
   end
