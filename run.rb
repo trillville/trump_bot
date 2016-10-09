@@ -14,7 +14,12 @@ class TrumpTweet < ActiveRecord::Base
   def publish_tweet
     return if rt_twitter_id || !twitter_id.present? || !prediction.present?
 
-    rt = $twitter.update("#{percentage}% chance @realDonaldTrump himself wrote this", in_reply_to_status_id: twitter_id)
+    puts "\n\nPOSTING TO TWITTER!"
+
+    msg = "#{percentage}% chance @realDonaldTrump himself wrote this"
+    puts msg
+
+    rt = $twitter.update(msg, in_reply_to_status_id: twitter_id)
     update_attributes!(rt_twitter_id: rt.id)
   end
 end
