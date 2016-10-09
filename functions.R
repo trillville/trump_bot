@@ -2,10 +2,10 @@
 # Load all tweets and update local data file ------------------------------------------------------------------------
 
 loadAllTweets <- function(start.date) {
-  setup_twitter_oauth(Sys.getenv("TWITTER_CONSUMER"),
+  setup_twitter_oauth(Sys.getenv("TWITTER_CONSUMER_KEY"),
                       Sys.getenv("TWITTER_CONSUMER_SECRET"),
-                      Sys.getenv("TWITTER_ACCCESS_TOKEN"),
-                      Sys.getenv("TWITTER_ACCCESS_TOKEN_SECRET"))
+                      Sys.getenv("TWITTER_ACCESS_TOKEN"),
+                      Sys.getenv("TWITTER_ACCESS_SECRET"))
   
   out <- tryCatch({
     load("trump_tweets.Rdata")
@@ -92,11 +92,12 @@ addFeatures <- function(df) {
 }
 
 
-# Make Predictions for all tweets since last.id ---------------------------
+# Make Predictions for all tweets (up to 50) since last.id ---------------------------
 
 predictTweets <- function(last.id) {
   tweets <- tbl_df(map_df(userTimeline("realDonaldTrump", n = 50, sinceID = last.id), as.data.frame))
   tweets <- addFeatures(tweets)
+  tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
   load("model.RData") # load model1
   preds <- predict(model1, tweets, type = "response")
   out <- data.frame(tweets$id, preds)
