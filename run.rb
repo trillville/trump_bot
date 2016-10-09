@@ -12,7 +12,7 @@ class TrumpTweet < ActiveRecord::Base
   def message
     @message ||= ["@realDonaldTrump probably",
       (percentage <= 50 ? "didn't" : "did"),
-      "tweet this,",
+      "write this,",
       ("only" if percentage <= 50),
       "#{percentage}%".with_indefinite_article,
       "chance that it was him!",
