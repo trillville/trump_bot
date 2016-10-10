@@ -31,10 +31,9 @@ class TrumpTweet < ActiveRecord::Base
                      : ["Tremendous", "High Energy", "Big League"].sample),
       "@realDonaldTrump",
       (high_confidence? ? "almost certainly" : "probably"),
-      (not_trump_himself? ? "didn't write" : "wrote"),
-      "this himself,",
+      (not_trump_himself? ? "had his staff write this," : "wrote this himself"),
       ("only" if probably_not?),
-      (definitely_not? ? "with a <1%" : "#{percentage}%".with_indefinite_article),
+      (definitely_not? ? "less than 1%" : "#{percentage}%".with_indefinite_article),
       "chance that it was him#{high_confidence? ? "!" : "."}",
       (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
                      : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
