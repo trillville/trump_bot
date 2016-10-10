@@ -6,7 +6,7 @@ class TrumpTweet < ActiveRecord::Base
   after_save :publish_tweet
 
   def percentage
-    @percentage ||= (prediction.to_f * 100).round
+    @percentage ||= [(prediction.to_f * 100).round, 99].min
   end
 
   def probably_not?
@@ -34,7 +34,7 @@ class TrumpTweet < ActiveRecord::Base
       (not_trump_himself? ? "didn't write" : "wrote"),
       "this himself,",
       ("only" if probably_not?),
-      (definitely_not? ? "with a ZERO %" : "#{percentage}%".with_indefinite_article),
+      (definitely_not? ? "with a < 1%" : "#{percentage}%".with_indefinite_article),
       "chance that it was him#{high_confidence? ? "!" : "."}",
       (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
                      : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
