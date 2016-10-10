@@ -34,7 +34,7 @@ class TrumpTweet < ActiveRecord::Base
       (not_trump_himself? ? "didn't write" : "wrote"),
       "this himself,",
       ("only" if probably_not?),
-      (definitely_not? ? "with a ZERO PERCENT" : "#{percentage}%".with_indefinite_article),
+      (definitely_not? ? "with a ZERO %" : "#{percentage}%".with_indefinite_article),
       "chance that it was him#{high_confidence? ? "!" : "."}",
       (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
                      : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
