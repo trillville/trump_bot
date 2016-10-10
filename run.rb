@@ -70,7 +70,7 @@ $twitter = Twitter::REST::Client.new do |config|
 end
 
 r_script = %x[which Rscript].chomp
-predictions_command = "#{r_script} --vanilla predict_tweets.R #{TrumpTweet.last.twitter_id}"
+predictions_command = "#{r_script} --vanilla predict_tweets.R #{TrumpTweet.all[10].twitter_id}"
 puts "running: `#{predictions_command}`"
 
 predictions_csv = %x[#{predictions_command}]
@@ -82,5 +82,6 @@ cleaned_csv = predictions_csv.split("\n")[1..-1].join("\n")
 
 CSV.parse(cleaned_csv, headers: true).each do |row|
   puts "predicted: #{row["id"]} has probability: #{row["prediction"]}"
+  next if row["prediction"] == "NA"
   TrumpTweet.find_or_initialize_by(twitter_id: row["id"]).update_attributes!(prediction: row["prediction"])
 end
