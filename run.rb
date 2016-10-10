@@ -6,26 +6,42 @@ class TrumpTweet < ActiveRecord::Base
   after_save :publish_tweet
 
   def percentage
-    (prediction.to_f * 100).round
+    @percentage ||= (prediction.to_f * 100).round
+  end
+
+  def probably_not?
+    percentage <= 50 && percentage > 0
+  end
+
+  def not_trump_himself?
+    percentage <= 50
+  end
+
+  def definitely_not?
+    percentage.zero?
+  end
+
+  def high_confidence?
+    percentage > 95 || percentage < 5
   end
 
   def message
     @message ||= [
-      (percentage <= 50 ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight"].sample
-                          : ["Tremendous", "High Energy", "Big League"].sample),
-      "@realDonaldTrump probably",
-      (percentage <= 50 ? "didn't write" : "wrote"),
-      "this,",
-      ("only" if percentage <= 50),
-      "#{percentage}%".with_indefinite_article,
-      "chance that it was him!",
-      (percentage <= 50 ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
-                          : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
+      (not_trump_himself? ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight"].sample
+                     : ["Tremendous", "High Energy", "Big League"].sample),
+      "@realDonaldTrump",
+      (high_confidence? ? "almost certainly" : "probably"),
+      (not_trump_himself? ? "didn't write" : "wrote"),
+      "this himself,",
+      ("only" if probably_not?),
+      ("with a ZERO PERCENT" if definitely_not?),
+      ("#{percentage}%".with_indefinite_article unless definitely_not?),
+      "chance that it was actually him#{high_confidence? ? "!" : "."}",
+      (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
+                     : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
       original_tweet.url
     ].compact.join(" ")
   end
-
-  protected
 
   def original_tweet
     @original_tweet ||= $twitter.status(twitter_id)
