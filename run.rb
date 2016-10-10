@@ -34,7 +34,7 @@ class TrumpTweet < ActiveRecord::Base
       (not_trump_himself? ? "didn't write" : "wrote"),
       "this himself,",
       ("only" if probably_not?),
-      (definitely_not? ? "with a < 1%" : "#{percentage}%".with_indefinite_article),
+      (definitely_not? ? "with a <1%" : "#{percentage}%".with_indefinite_article),
       "chance that it was him#{high_confidence? ? "!" : "."}",
       (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
                      : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
@@ -80,7 +80,7 @@ puts predictions_csv
 
 cleaned_csv = predictions_csv.split("\n")[1..-1].join("\n")
 
-CSV.parse(cleaned_csv, headers: true).each do |row|
+CSV.parse(cleaned_csv, headers: true).reverse.each do |row|
   puts "predicted: #{row["id"]} has probability: #{row["prediction"]}"
   TrumpTweet.find_or_initialize_by(twitter_id: row["id"]).update_attributes!(prediction: row["prediction"])
 end
