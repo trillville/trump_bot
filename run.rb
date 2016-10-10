@@ -70,7 +70,7 @@ $twitter = Twitter::REST::Client.new do |config|
 end
 
 r_script = %x[which Rscript].chomp
-predictions_command = "#{r_script} --vanilla predict_tweets.R #{TrumpTweet.all[10].twitter_id}"
+predictions_command = "#{r_script} --vanilla predict_tweets.R #{TrumpTweet.last.twitter_id}"
 puts "running: `#{predictions_command}`"
 
 predictions_csv = %x[#{predictions_command}]
