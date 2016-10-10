@@ -80,7 +80,7 @@ puts predictions_csv
 
 cleaned_csv = predictions_csv.split("\n")[1..-1].join("\n")
 
-CSV.parse(cleaned_csv, headers: true).reverse.each do |row|
+CSV.parse(cleaned_csv, headers: true).each do |row|
   puts "predicted: #{row["id"]} has probability: #{row["prediction"]}"
   TrumpTweet.find_or_initialize_by(twitter_id: row["id"]).update_attributes!(prediction: row["prediction"])
 end
