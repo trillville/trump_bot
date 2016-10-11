@@ -27,7 +27,7 @@ class TrumpTweet < ActiveRecord::Base
 
   def message
     @message ||= [
-      (not_trump_himself? ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight"].sample
+      (not_trump_himself? ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight", "Goofy", "Crooked", "Lyin"].sample
                      : ["Tremendous", "High Energy", "Big League"].sample),
       "@realDonaldTrump",
       (high_confidence? ? "almost certainly" : "probably"),
@@ -36,7 +36,7 @@ class TrumpTweet < ActiveRecord::Base
       (definitely_not? ? "less than 1%" : "#{percentage}%".with_indefinite_article),
       "chance that it was him#{high_confidence? ? "!" : "."}",
       (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!"].sample
-                     : ["Smart!", "Winning!", "Tough!", "AMAZING!"].sample),
+                     : ["Smart!", "Winning!", "Locker room banter!", "AMAZING!"].sample),
       original_tweet.url
     ].compact.join(" ")
   end
