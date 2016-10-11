@@ -1,5 +1,3 @@
-# twitter API keys used
-source("keys.R")
 source("libs_constants.R")
 source("functions.R")
 
