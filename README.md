@@ -1,5 +1,5 @@
 # A Tale of Two Trumps
-Inspired by [Dave Robinson's](https://github.com/dgrtwo/dgrtwo.github.com/blob/master/_R/2016-08-09-trump-tweets.Rmd) great post, we put together a bot that predicts the TRUE author of the many colorful tweets spouting out from the @realdonaldtrump twitter handle. 
+Inspired by [Dave Robinson's](https://github.com/dgrtwo/dgrtwo.github.com/blob/master/_R/2016-08-09-trump-tweets.Rmd) great post, we put together a [bot](https://twitter.com/TwoTrumps) that predicts the TRUE author of the many colorful tweets spouting out from the @realdonaldtrump twitter handle. 
 
 This program scrapes Donald’s twitter account for any new tweets since the last time it was run, and retweets any original content (retweets and quotes are filtered out), using a simple logistic regression to estimate the probability that he (as opposed to his staff) was the true author. 
 
