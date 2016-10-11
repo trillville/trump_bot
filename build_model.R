@@ -8,7 +8,7 @@ source("functions.R")
 
 trump.tweets <- loadAllTweets(START_DATE)
 
-classified.tweets <- read_csv("C:/Users/tillm/OneDrive/Documents/twitter_bot/training/classified.csv")
+classified.tweets <- read_csv("classified.csv")
 classified.tweets <- unique(classified.tweets)
 
 training.tweets <- left_join(trump.tweets, classified.tweets) %>%
