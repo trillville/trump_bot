@@ -9,7 +9,6 @@ setup_twitter_oauth(Sys.getenv("TWITTER_CONSUMER_KEY"),
 last.id <- commandArgs(trailingOnly=TRUE)[1] # "784216198259085312"
 
 predictions <- predictTweets(last.id)
-print(predictions)
 
 write.csv(predictions, "predictions.csv")
 
