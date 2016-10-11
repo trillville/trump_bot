@@ -12,4 +12,4 @@ The twitter posting bot was built in Ruby, and we used a scheduler on Heroku to 
 TODOs:
 * Build a fun dashboard that lets folks see, graphically, the main factors leading to a particular classification decision
 * Migrate all of the .RData files to the Heroku Postgres database
-* Apply some topic modeling methods, such as ATM or LDA, to monitor trends and/or improve classifier 
+* Apply some topic modeling methods, such as ATM or LDA, to monitor trends and/or improve the classifier 
