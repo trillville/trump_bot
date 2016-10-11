@@ -10,6 +10,6 @@ Does this make sense? Probably not! But let’s be honest, neither does building
 The twitter posting bot was built in Ruby, and we used a scheduler on Heroku to run the script (`bundle exec ruby run.rb`) every 10 minutes.
 
 TODOs:
-* Build a fun dashboard that lets folks see, graphically, the main factors leading classification decision
+* Build a fun dashboard that lets folks see, graphically, the main factors leading to a particular classification decision
 * Migrate all of the .RData files to the Heroku Postgres database
 * Apply some topic modeling methods, such as ATM or LDA, to monitor trends and/or improve classifier 
