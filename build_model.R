@@ -39,9 +39,9 @@ if (FEATURE_SELECTION == TRUE) {
 }
 
 # LOGISTIC REGRESSION
-model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + source + 
-                sadness + anger + surprise + positive + disgust + joy + anticipation +
-                num.words + user.score, 
+
+model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + source + sadness + anger + 
+                surprise + positive + disgust + joy + anticipation + num.words + user.score, 
               family = binomial(),
               data = tweets)
 
