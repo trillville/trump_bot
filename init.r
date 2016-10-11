@@ -26,6 +26,10 @@ if (!"tidytext" %in% installed.packages()) {
 	install.packages("tidytext", dependencies = TRUE)
 }
 
+if (!"gam" %in% installed.packages()) {
+	install.packages("gam", dependencies = TRUE)
+}
+
 if (!"readr" %in% installed.packages()) {
 	install.packages("readr", dependencies = TRUE)
 }
