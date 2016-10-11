@@ -39,7 +39,7 @@ if (FEATURE_SELECTION == TRUE) {
 }
 
 # LOGISTIC REGRESSION
-model1 <- glm(trump ~ hour + has.pic.link + trust + fear + negative + source + 
+model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + source + 
                 sadness + anger + surprise + positive + disgust + joy + anticipation +
                 num.words + user.score, 
               family = binomial(),
@@ -49,8 +49,9 @@ save(model1, file = "model.RData")
 
 # Unused Models -----------------------------------------------------------
 
-# x.vars <- as.matrix(select(tweets, hour, has.quotes, has.pic.link, trust, fear, negative, sadness, 
-#                            anger, surprise, positive, disgust, joy, anticipation))
+# x.vars <- as.matrix(select(tweets, hour, has.quotes, has.pic.link, trust, fear, negative, sadness,
+#                            anger, surprise, positive, disgust, joy, anticipation, num.words, user.score))
+# y.var <- as.factor(tweets$trump)
 # train <- sample(nrow(tweets), nrow(tweets)/2)
 
 # # XGBOOST

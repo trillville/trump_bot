@@ -7,6 +7,7 @@ library(scales)
 library(stringr)
 library(tidytext)
 library(readr)
+library(gam)
 
 
 # Constants ---------------------------------------------------------------
