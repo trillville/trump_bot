@@ -76,7 +76,7 @@ addFeatures <- function(df) {
            anticipation = sum(sentiment == "anticipation", na.rm = TRUE),
            num.words    = n())
   
-  load("trump_dict.Rdata")
+  load("trump_dict.RData")
   odds.table <- left_join(all.words, trump.dict) %>%
     group_by(id) %>%
     summarise(user.score = sum(logratio, na.rm = TRUE))
