@@ -14,6 +14,8 @@ classified.tweets <- unique(classified.tweets)
 training.tweets <- left_join(trump.tweets, classified.tweets) %>%
   filter(!is.na(trump))
 
+updateTrumpDict(training.tweets, cutoff = 5)
+
 tweets <- addFeatures(training.tweets)
 
 # Modeling -------------------------------------------------------------------
@@ -21,9 +23,25 @@ tweets <- addFeatures(training.tweets)
 tweets <- tweets[complete.cases(tweets), ]
 tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
 
+# Feature Selection
+
+FEATURE_SELECTION <- FALSE
+if (FEATURE_SELECTION == TRUE) {
+  all.x <- select(tweets, hour, has.pic.link, trust, fear, negative, source, 
+                  sadness, anger, surprise, positive, disgust, joy, anticipation,
+                  num.words, user.score)
+  all.y <- tweets$trump
+  library(Boruta)
+  bor.results <- Boruta(all.x,
+                        all.y,
+                        maxRuns = 500,
+                        doTrace = 2)
+}
+
 # LOGISTIC REGRESSION
 model1 <- glm(trump ~ hour + has.pic.link + trust + fear + negative + source + 
-                sadness + anger + surprise + positive + disgust + joy + anticipation, 
+                sadness + anger + surprise + positive + disgust + joy + anticipation +
+                num.words + user.score, 
               family = binomial(),
               data = tweets)
 

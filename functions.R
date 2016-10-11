@@ -45,6 +45,8 @@ addFeatures <- function(df) {
     select(-favorited, -favoriteCount, -replyToSN, -truncated, -replyToSID, -replyToUID,
            -screenName, -retweetCount, -retweeted, -longitude, -latitude)
   
+  tweets$source[is.na(tweets$source)] <- "Other"
+  
   # has.quotes indicates a tweet wrapped in quotation marks 
   tweets$has.quotes <- ifelse(str_detect(tweets$text, c('^"')), 1, 0)
   
@@ -53,23 +55,16 @@ addFeatures <- function(df) {
   
   # Sentiment Analysis ------------------------------------------------------
   
-  reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
-  
-  all.words <- tweets %>%
-    filter(!str_detect(text, '^"')) %>%
-    mutate(text = str_replace_all(text, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
-    unnest_tokens(word, text, token = "regex", pattern = reg) %>%
-    filter(!word %in% stop_words$word, str_detect(word, "[a-z]")) %>% # drop stop words
-    select(id, word, source)
+  all.words <- breakOutWords(tweets)
   
   nrc <- sentiments %>%
     filter(lexicon == "nrc") %>%
     dplyr::select(word, sentiment)
   
-  all.words <- left_join(all.words, nrc,
+  sentiment.table<- left_join(all.words, nrc,
                          by = c("word" = "word")) %>%
     group_by(id) %>%
-    mutate(trust        = sum(sentiment == "trust", na.rm = TRUE),
+    summarise(trust        = sum(sentiment == "trust", na.rm = TRUE),
            fear         = sum(sentiment == "fear", na.rm = TRUE),
            negative     = sum(sentiment == "negative", na.rm = TRUE),
            sadness      = sum(sentiment == "sadness", na.rm = TRUE),
@@ -79,16 +74,55 @@ addFeatures <- function(df) {
            disgust      = sum(sentiment == "disgust", na.rm = TRUE),
            joy          = sum(sentiment == "joy", na.rm = TRUE),
            anticipation = sum(sentiment == "anticipation", na.rm = TRUE),
-           num.words    = n()) %>%
-    filter(row_number(word) == 1) %>%
-    select(-word, -sentiment)
+           num.words    = n())
   
-  tweets <- left_join(tweets, all.words)
-  tweets[, EMOTIONS] <- apply(tweets[, EMOTIONS], 2, function(x) {replace(x, is.na(x), 0)})
+  load("trump_dict.Rdata")
+  odds.table <- left_join(all.words, trump.dict) %>%
+    group_by(id) %>%
+    summarise(user.score = sum(logratio, na.rm = TRUE))
+    
+  tweets <- left_join(tweets, sentiment.table) %>%
+    left_join(odds.table)
+  
+  tweets[, c(EMOTIONS, "user.score")] <- apply(tweets[, c(EMOTIONS, "user.score")], 2, function(x) {replace(x, is.na(x), 0)})
   
   tweets$total.emotion <- rowSums(tweets[, EMOTIONS])
   
   return (tweets)
+}
+
+# takes a DF of words mapped to ID, and returns a DF 
+# showing log ratio (higher = more likely to be trump)
+updateTrumpDict <- function(df, cutoff) {
+  all.words <- breakOutWords(df, include.source = TRUE) 
+  
+  trump.dict <- count(all.words,word, trump) %>%
+    filter(sum(n) >= cutoff) %>%
+    spread(trump, n, fill = 0) %>%
+    ungroup() %>%
+    mutate_each(funs((. + 1) / sum(. + 1)), -word) %>%
+    mutate(logratio = log2(`1` / `0`)) %>%
+    arrange(desc(logratio)) %>%
+    select(-`0`, -`1`)
+  
+  save(trump.dict, file = "trump_dict.RData")
+}
+
+# breaks a data frame of tweets into a data frame of words
+breakOutWords <- function(df, include.source = FALSE) {
+  reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
+  
+  all.words <- df %>%
+    mutate(text = str_replace_all(text, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
+    unnest_tokens(word, text, token = "regex", pattern = reg) %>%
+    filter(!word %in% stop_words$word, str_detect(word, "[a-z]")) # drop stop words
+  
+  if (include.source == TRUE) {
+    select(all.words, id, word, trump)
+  } else {
+    select(all.words, id, word)
+  }
+  return(all.words)
 }
 
 
@@ -98,7 +132,9 @@ predictTweets <- function(last.id) {
   tweets <- tbl_df(map_df(userTimeline("realDonaldTrump", n = 50, sinceID = last.id), as.data.frame))
   tweets <- addFeatures(tweets)
   tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
+  
   load("model.RData") # load model1
+  
   preds <- predict(model1, tweets, type = "response")
   out <- data.frame(tweets$id, preds)
   colnames(out) <- c("id", "prediction")
