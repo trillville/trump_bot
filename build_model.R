@@ -43,7 +43,7 @@ if (FEATURE_SELECTION == TRUE) {
 model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + source + sadness + anger + 
                 surprise + positive + disgust + joy + anticipation + num.words + user.score + has.pic.link*source,
               family = binomial(),
-              data = tweets)
+              data = tweets[train, ])
 
 # probs <- predict(model1, tweets[-train, ], type = "response")
 # preds <- ifelse(probs > 0.5, 1, 0)
