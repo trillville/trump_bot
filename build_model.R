@@ -38,12 +38,16 @@ if (FEATURE_SELECTION == TRUE) {
 
 # LOGISTIC REGRESSION
 
-#train <- sample(nrow(tweets), nrow(tweets)/2)
+# train <- sample(nrow(tweets), nrow(tweets)/2)
 
 model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + source + sadness + anger + 
                 surprise + positive + disgust + joy + anticipation + num.words + user.score + has.pic.link*source,
               family = binomial(),
               data = tweets)
+
+# probs <- predict(model1, tweets[-train, ], type = "response")
+# preds <- ifelse(probs > 0.5, 1, 0)
+# table(preds, tweets$trump[-train])
 
 save(model1, file = "model.RData")
 
