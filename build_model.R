@@ -49,6 +49,7 @@ model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + sour
 # preds <- ifelse(probs > 0.5, 1, 0)
 # table(preds, tweets$trump[-train])
 
+
 save(model1, file = "model.RData")
 
 # Unused Models -----------------------------------------------------------
