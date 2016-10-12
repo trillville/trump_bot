@@ -12,7 +12,7 @@ classified.tweets <- unique(classified.tweets)
 training.tweets <- left_join(trump.tweets, classified.tweets) %>%
   filter(!is.na(trump))
 
-updateTrumpDict(training.tweets, cutoff = 5)
+updateTrumpDict(training.tweets, cutoff = 1)
 
 tweets <- addFeatures(training.tweets)
 
@@ -37,6 +37,8 @@ if (FEATURE_SELECTION == TRUE) {
 }
 
 # LOGISTIC REGRESSION
+
+#train <- sample(nrow(tweets), nrow(tweets)/2)
 
 model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + source + sadness + anger + 
                 surprise + positive + disgust + joy + anticipation + num.words + user.score + has.pic.link*source,
