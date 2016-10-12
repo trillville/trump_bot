@@ -35,7 +35,7 @@ class TrumpTweet < ActiveRecord::Base
       (definitely_not? ? "under 1%" : "#{percentage}%".with_indefinite_article),
       "chance that it was him#{high_confidence? ? "!" : "."}",
       (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!", "Locker room!", "Sad!"].sample
-                     : ["Smart!", "Winning!", "Locker room!", "AMAZING!"].sample),
+                     : ["Smart!", "Winning!", "Locker room!", "AMAZING!", "ENJOY!"].sample),
       original_tweet.url
     ].compact.join(" ")
   end
