@@ -28,14 +28,14 @@ class TrumpTweet < ActiveRecord::Base
   def message
     @message ||= [
       (not_trump_himself? ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight", "Goofy", "Crooked", "Lyin", "Unattractive"].sample
-                     : ["Tremendous", "High Energy", "Big League", "Strong", "Wall!", "Huge"].sample),
+                     : ["Tremendous", "High Energy", "Big League", "Strong", "Wall!", "Huge","Voter Fraud!"].sample),
       "@realDonaldTrump",
       (high_confidence? ? "definitely" : "probably"),
       (not_trump_himself? ? "had his staff write this," : "wrote this himself,"),
       (definitely_not? ? "under 1%" : "#{percentage}%".with_indefinite_article),
       "chance that it was him#{high_confidence? ? "!" : "."}",
-      (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!", "Disloyal!", "Sad!", "China!", "Mexico!", "Benghazi!", "Rigged!"].sample
-                     : ["Smart!", "Winning!", "Locker room!", "AMAZING!", "ENJOY!", "Obama!"].sample),
+      (not_trump_himself? ? ["Weak!", "Dummy!", "Loser!", "Bad!", "Disloyal!", "Sad!", "China!", "Mexico!", "Benghazi!", "RIGGED!"].sample
+                     : ["Smart!", "Winning!", "Locker room!", "AMAZING!", "ENJOY!", "Obama!", "Wikileaks!"].sample),
       original_tweet.url
     ].compact.join(" ")
   end
