@@ -29,7 +29,7 @@ class TrumpTweet < ActiveRecord::Base
     @message ||= [
       (not_trump_himself? ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight", "Goofy", "Crooked", "Lyin", "Unattractive"].sample
                      : ["Tremendous", "High Energy", "Big League", "Strong", "Wall!", "Huge","Voter Fraud!"].sample),
-      "@realDonaldTrump",
+      "Donald",
       (high_confidence? ? "definitely" : "probably"),
       (not_trump_himself? ? "had his staff write this," : "wrote this himself,"),
       (definitely_not? ? "under 1%" : "#{percentage}%".with_indefinite_article),
