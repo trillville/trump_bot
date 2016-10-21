@@ -52,7 +52,8 @@ class TrumpTweet < ActiveRecord::Base
     puts "\n\nPOSTING TO TWITTER!"
     puts message
 
-    rt = $twitter.update(message, in_reply_to_status_id: twitter_id)
+    #rt = $twitter.update(message, in_reply_to_status_id: twitter_id)
+    rt = $twitter.update(message)
     update_attributes!(rt_twitter_id: rt.id)
   end
 end
