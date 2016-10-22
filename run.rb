@@ -27,7 +27,7 @@ class TrumpTweet < ActiveRecord::Base
 
   def message
     @message ||= [
-      (not_trump_himself? ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight", "Goofy", "Crooked", "Lyin", "Unattractive"].sample
+      (not_trump_himself? ? ["Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight", "Goofy", "Crooked", "Lyin'", "Unattractive"].sample
                      : ["Tremendous", "High Energy", "Big League", "Strong", "Wall!", "Huge","Voter Fraud!"].sample),
       "Donald",
       (high_confidence? ? "definitely" : "probably"),
