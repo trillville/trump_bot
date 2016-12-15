@@ -9,7 +9,7 @@ Does this make sense? Probably not! But let’s be honest, neither does building
 
 The twitter posting bot was built in Ruby, and we used a scheduler on Heroku to run the script (`bundle exec ruby run.rb`) every 10 minutes.
 
-For those of you that are interested, here's the summary (showing statistical significant of the various features) for the current model:
+Summary (showing statistical significant of the various features) for the current model:
 
 | Coefficient             | z-value  | Pr(>z)   |
 | ----------------------- | :------: | :------: |
