@@ -12,26 +12,27 @@ The twitter posting bot was built in Ruby, and we used a scheduler on Heroku to 
 For those of you that are interested, here's the summary (showing statistical significant of the various features) for the current model:
 
 Coefficients:
-                         Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               0.39771    0.45527   0.874   0.3823    
-s(hour, 2)                0.02902    0.02595   1.118   0.2634    
-has.pic.link             -0.09704    1.21685  -0.080   0.9364    
-trust                     0.04548    0.26754   0.170   0.8650    
-fear                      0.02642    0.35421   0.075   0.9405    
-negative                 -0.05225    0.32172  -0.162   0.8710    
-sourceOther              -4.09319    0.42460  -9.640   <2e-16 ***
-sadness                  -0.27443    0.39115  -0.702   0.4829    
-anger                     0.64118    0.34110   1.720   0.0835 .   
-surprise                 -0.58931    0.35592  -1.656   0.0978 .  
-positive                  0.31749    0.22646   1.402   0.1609    
-disgust                  -0.02660    0.38272  -0.070   0.9446    
-joy                      -0.16915    0.35832  -0.472   0.6369    
-anticipation             -0.17713    0.33710  -0.525   0.5993    
-num.words                 0.12614    0.06428   1.962   0.0497 *  
-user.score                0.50602    0.04108  12.317   <2e-16 ***
-has.pic.link:sourceOther -2.38863    1.42333  -1.678   0.0933 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+| Coefficient             | z-value  | Pr(>z)   |
+| ----------------------- | -------- | -------- |
+| s(hour, 2)              |  1.118   | 0.382    |
+| has.pic.link            | -0.080   | 0.263    |
+| trust.                  |  0.170   | 0.936    |
+| fear                    |  0.075   | 0.865    |
+| negative                | -0.162   | 0.810    |
+| sourceOther             | -9.640   | <2e-16***|
+| sadness                 | -0.702   | 0.483    |
+| anger                   |  1.720   | 0.085*   |
+| surprise                | -1.656   | 0.098*   |
+| positive                |  1.402   | 0.161    |
+| disgust                 | -0.070   | 0.945    |
+| joy                     | -0.472   | 0.637    |
+| anticipation            | -0.525   | 0.599    |
+| num.words               |  1.962   | 0.049**  |
+| user.score              |  12.317  | <2e-16***|
+| has.pic.link:sourceOthe | -1.678   | 0.093*   |
+
+Signif. codes:  0.01: *** 0.05: ** 0.1: * 
 
 TODOs:
 * Build a fun dashboard that lets folks see, graphically, the main factors leading to a particular classification decision
