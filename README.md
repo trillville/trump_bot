@@ -11,8 +11,6 @@ The twitter posting bot was built in Ruby, and we used a scheduler on Heroku to 
 
 For those of you that are interested, here's the summary (showing statistical significant of the various features) for the current model:
 
-Coefficients:
-
 | Coefficient             | z-value  | Pr(>z)   |
 | ----------------------- | -------- | -------- |
 | s(hour, 2)              |  1.118   | 0.382    |
