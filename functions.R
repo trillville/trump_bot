@@ -45,8 +45,11 @@ addFeatures <- function(df) {
     select(-favorited, -favoriteCount, -replyToSN, -truncated, -replyToSID, -replyToUID,
            -screenName, -retweetCount, -retweeted, -longitude, -latitude)
   
-  tweets$source <- ifelse(is.na(tweets$source), "Other", ifelse(tweets$source != "Android",
-                                                                "Other", "Android"))
+  if(USE_DEVICE_SOURCE == TRUE){
+    tweets$source <- ifelse(is.na(tweets$source), "Other", ifelse(tweets$source != "Android",
+                                                                  "Other", "Android"))
+    
+  }
   
   # has.quotes indicates a tweet wrapped in quotation marks 
   tweets$has.quotes <- ifelse(str_detect(tweets$text, c('^"')), 1, 0)
