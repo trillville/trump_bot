@@ -40,8 +40,8 @@ if (FEATURE_SELECTION == TRUE) {
 
 # train <- sample(nrow(tweets), nrow(tweets)/2)
 
-model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + source + sadness + anger + 
-                surprise + positive + disgust + joy + anticipation + num.words + user.score + has.pic.link*source,
+model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + sadness + anger + 
+                surprise + positive + disgust + joy + anticipation + num.words + user.score + has.pic.link,
               family = binomial(),
               data = tweets)
 
