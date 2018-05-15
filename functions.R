@@ -141,6 +141,9 @@ keepModelVars <- function(df, include.label = FALSE) {
 
 predictTweets <- function(last.id) {
   tweets <- tbl_df(map_df(userTimeline("realDonaldTrump", n = 50, sinceID = last.id), as.data.frame))
+  if(nrow(tweets) == 0) {
+    stop("NO NEW TWEETS - BYE!!!")
+  }
   tweets <- addFeatures(tweets)
   tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
   model_data <- keepModelVars(tweets)
