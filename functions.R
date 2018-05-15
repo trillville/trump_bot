@@ -146,8 +146,8 @@ predictTweets <- function(last.id) {
   model_data <- keepModelVars(tweets)
   
   load("model.RData") # load model1
-  
-  preds <- predict(model1, tweets, type = "response")
+  message("GENERATING PREDICTIONS")
+  preds <- predict(model1, model_data, type = "response")
   out <- data.frame(tweets$id, preds)
   colnames(out) <- c("id", "prediction")
   return(out)
