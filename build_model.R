@@ -39,9 +39,10 @@ if (FEATURE_SELECTION == TRUE) {
 # LOGISTIC REGRESSION
 
 # train <- sample(nrow(tweets), nrow(tweets)/2)
+tweets <- keepModelVars(tweets, include.label = TRUE)
 
 model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + sadness + anger + 
-                surprise + positive + disgust + joy + anticipation + num.words + user.score + has.pic.link,
+                surprise + positive + disgust + joy + anticipation + num.words + user.score,
               family = binomial(),
               data = tweets)
 

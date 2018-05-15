@@ -16,4 +16,4 @@ START_DATE <- as.Date("2016-01-09")
 
 EMOTIONS <- c("trust", "fear", "negative", "sadness", "anger", "surprise", "positive", "disgust", "joy", "anticipation")
 
-USE_DEVICE_SOURCE <- FALSE
+MODEL_FEATURES <- c("hour", EMOTIONS, "num.words", "user.score", "has.pic.link")

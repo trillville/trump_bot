@@ -45,11 +45,8 @@ addFeatures <- function(df) {
     select(-favorited, -favoriteCount, -replyToSN, -truncated, -replyToSID, -replyToUID,
            -screenName, -retweetCount, -retweeted, -longitude, -latitude)
   
-  if(USE_DEVICE_SOURCE == TRUE){
-    tweets$source <- ifelse(is.na(tweets$source), "Other", ifelse(tweets$source != "Android",
+  tweets$source <- ifelse(is.na(tweets$source), "Other", ifelse(tweets$source != "Android",
                                                                   "Other", "Android"))
-    
-  }
   
   # has.quotes indicates a tweet wrapped in quotation marks 
   tweets$has.quotes <- ifelse(str_detect(tweets$text, c('^"')), 1, 0)
@@ -129,6 +126,16 @@ breakOutWords <- function(df, include.source = FALSE) {
   return(all.words)
 }
 
+keepModelVars <- function(df, include.label = FALSE) {
+  if(include.label == TRUE) {
+    features <- c(MODEL_FEATURES, "trump")
+  } else {
+    features <- MODEL_FEATURES
+  }
+  out <- df %>% select(one_of(features))
+  return(out)
+}
+
 
 # Make Predictions for all tweets (up to 50) since last.id ---------------------------
 
@@ -136,6 +143,7 @@ predictTweets <- function(last.id) {
   tweets <- tbl_df(map_df(userTimeline("realDonaldTrump", n = 50, sinceID = last.id), as.data.frame))
   tweets <- addFeatures(tweets)
   tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
+  model_data <- keepModelVars(tweets)
   
   load("model.RData") # load model1
   
