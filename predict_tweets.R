@@ -5,7 +5,7 @@ message(getwd())
 
 last.id <- commandArgs(trailingOnly=TRUE)[1] # "784216198259085312"
 
-predictions <- predictTweets(last.id)
+predictions <- tail(predictTweets(last.id), 1)
 
 write.csv(predictions, "predictions.csv")
 
