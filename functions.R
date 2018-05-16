@@ -159,14 +159,14 @@ predictTweets <- function(last.id) {
   message("Loading Tweets!")
   message("Last ID: ", last.id)
   tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id)
+  if(nrow(tweets) == 0) {
+    stop("NO NEW TWEETS - BYE!!!")
+  }
   message("Loaded Tweets: ", nrow(tweets))
   tweets <- tweets %>% mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
     select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
            id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
            retweeted, longitude = country_code, latitude = place_name)
-  if(nrow(tweets) == 0) {
-    stop("NO NEW TWEETS - BYE!!!")
-  }
   tweets <- addFeatures(tweets)
   tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
   model_data <- keepModelVars(tweets)
