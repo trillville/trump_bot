@@ -1,10 +1,9 @@
 source("libs_constants.R")
 source("functions.R")
 
-setup_twitter_oauth(Sys.getenv("TWITTER_CONSUMER_KEY"),
-                    Sys.getenv("TWITTER_CONSUMER_SECRET"),
-                    Sys.getenv("TWITTER_ACCESS_TOKEN"),
-                    Sys.getenv("TWITTER_ACCESS_SECRET"))
+create_token(app="Tale o' Dos Trumpos",
+             consumer_key = Sys.getenv("TWITTER_CONSUMER_KEY"),
+             consumer_secret = Sys.getenv("TWITTER_CONSUMER_SECRET"))
 
 last.id <- commandArgs(trailingOnly=TRUE)[1] # "784216198259085312"
 

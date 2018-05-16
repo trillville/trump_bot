@@ -2,16 +2,19 @@
 # Load all tweets and update local data file ------------------------------------------------------------------------
 
 loadAllTweets <- function(start.date) {
-  setup_twitter_oauth(Sys.getenv("TWITTER_CONSUMER_KEY"),
-                      Sys.getenv("TWITTER_CONSUMER_SECRET"),
-                      Sys.getenv("TWITTER_ACCESS_TOKEN"),
-                      Sys.getenv("TWITTER_ACCESS_SECRET"))
-  
+  create_token(app="Tale o' Dos Trumpos",
+               consumer_key = Sys.getenv("TWITTER_CONSUMER_KEY"),
+               consumer_secret = Sys.getenv("TWITTER_CONSUMER_SECRET"))
+
   out <- tryCatch({
     load("trump_tweets.Rdata")
     current.max.id <- trump.tweets$id[which.max(trump.tweets$created)]
     message("loading new tweets...")
-    trump.tweets <- rbind(trump.tweets, tbl_df(map_df(userTimeline("realDonaldTrump", n = 3200, sinceID = current.max.id), as.data.frame)))
+    trump.tweets <- rbind(trump.tweets, get_timeline("realDonaldTrump", n = 3200, since_id = current.max.id) %>%
+                            mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
+                            select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
+                                   id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
+                                   retweeted, longitude = country_code, latitude = place_name))
     save(trump.tweets, file = "trump_tweets.RData")
     return(trump.tweets)
   },
@@ -19,14 +22,22 @@ loadAllTweets <- function(start.date) {
   warning = function(cond) {
     message("Data not found, downloading...")
     message("loading...")
-    trump.tweets <- tbl_df(map_df(userTimeline("realDonaldTrump", n = 100), as.data.frame))
+    trump.tweets <- get_timeline("realDonaldTrump", n = 100) %>%
+      mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
+      select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
+             id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
+             retweeted, longitude = country_code, latitude = place_name)
     current.min <- min(trump.tweets$created)
     while (as.Date(current.min) >= START_DATE) {
       message(paste("loading... oldest tweet so far:", min(as.Date(trump.tweets$created))))
       current.min <- min(trump.tweets$created)
       current.min.id <- trump.tweets$id[which(trump.tweets$created == current.min)]
       trump.tweets <- trump.tweets[-which(trump.tweets$id == current.min.id), ]
-      trump.tweets <- rbind(trump.tweets, tbl_df(map_df(userTimeline("realDonaldTrump", n = 100, maxID = current.min.id), as.data.frame)))
+      trump.tweets <- rbind(trump.tweets, get_timeline("realDonaldTrump", n = 100,  max_id = current.min.id) %>%
+                              mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
+                              select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
+                                     id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
+                                     retweeted, longitude = country_code, latitude = place_name))
     }
     save(trump.tweets, file = "trump_tweets.RData")
     return(trump.tweets)
@@ -140,7 +151,11 @@ keepModelVars <- function(df, include.label = FALSE) {
 # Make Predictions for all tweets (up to 50) since last.id ---------------------------
 
 predictTweets <- function(last.id) {
-  tweets <- tbl_df(map_df(userTimeline("realDonaldTrump", n = 50, sinceID = last.id), as.data.frame))
+  tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id) %>%
+    mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
+    select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
+           id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
+           retweeted, longitude = country_code, latitude = place_name)
   if(nrow(tweets) == 0) {
     stop("NO NEW TWEETS - BYE!!!")
   }

@@ -33,3 +33,12 @@ if (!"gam" %in% installed.packages()) {
 if (!"readr" %in% installed.packages()) {
 	install.packages("readr", dependencies = TRUE)
 }
+
+if (!"devtools" %in% installed.packages()) {
+  install.packages("devtools", dependencies = TRUE)
+}
+
+if (!"rtweet" %in% installed.packages()) {
+  library(devtools)
+  devtools::install_github("mkearney/rtweet")
+}

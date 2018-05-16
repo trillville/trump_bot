@@ -1,6 +1,6 @@
 library(dplyr)
 library(purrr)
-library(twitteR)
+library(rtweet)
 library(tidyr)
 library(lubridate)
 library(scales)
