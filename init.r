@@ -1,4 +1,3 @@
-remove.packages("rtweet")
 if (!"dplyr" %in% installed.packages()) {
 	install.packages("dplyr", dependencies = TRUE)
 }
