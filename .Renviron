@@ -1,1 +1,1 @@
-TWITTER_PAT=~/twitter_token.rds
+TWITTER_PAT=/app/twitter_token.rds
