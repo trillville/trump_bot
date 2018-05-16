@@ -150,10 +150,16 @@ keepModelVars <- function(df, include.label = FALSE) {
 # Make Predictions for all tweets (up to 50) since last.id ---------------------------
 
 predictTweets <- function(last.id) {
+  if(is.na(last.id)) {
+    tmp <- get_timeline("TwoTrumps", n = 100) %>%
+      filter(!is.na(quoted_status_id) & is.na(mentions_user_id)) %>%
+      arrange(desc(quoted_status_id))
+    last.id <- tmp$quoted_status_id[1]
+  }
   message("Loading Tweets!")
   message("Last ID: ", last.id)
   tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id)
-  messsage("Loaded Tweets: ", nrow(tweets))
+  message("Loaded Tweets: ", nrow(tweets))
   tweets <- tweets %>% mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
     select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
            id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
