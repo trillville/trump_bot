@@ -199,7 +199,7 @@ highConfidence <- function(percentage) {
   return(percentage > 95 || percentage < 5)
 }
 
-message <- function(pred) {
+getMessage <- function(pred) {
   percent <- pct(pred$prediction)
   url <- paste("https://twitter.com/realDonaldTrump/status/", pred$id, sep = "")
   msg <- paste(sample(PREFIX_WORDS)[1], "Donald", ifelse(highConfidence(percent), "definitely", "probably"), 
@@ -217,7 +217,7 @@ postAllTweets <- function(preds) {
     stop("NO NEW TWEETS - BYE!!!")
   }
   for(i in 1:nrow(preds)) {
-    msg <- message(preds[i,])
+    msg <- getMessage(preds[i,])
     post_tweet(status = msg)
   }
 }
