@@ -34,6 +34,10 @@ if (!"readr" %in% installed.packages()) {
 	install.packages("readr", dependencies = TRUE)
 }
 
+if (!"httpuv" %in% installed.packages()) {
+  install.packages("httpuv", dependencies = TRUE)
+}
+
 if (!"devtools" %in% installed.packages()) {
   install.packages("devtools", dependencies = TRUE)
 }

@@ -8,7 +8,7 @@ library(stringr)
 library(tidytext)
 library(readr)
 library(gam)
-
+library(httpuv)
 
 # Constants ---------------------------------------------------------------
 
