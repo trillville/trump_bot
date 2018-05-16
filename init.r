@@ -1,3 +1,4 @@
+remove.packages("rtweet")
 if (!"dplyr" %in% installed.packages()) {
 	install.packages("dplyr", dependencies = TRUE)
 }
@@ -38,7 +39,6 @@ if (!"devtools" %in% installed.packages()) {
   install.packages("devtools", dependencies = TRUE)
 }
 
-remove.packages("rtweet")
 if (!"rtweet" %in% installed.packages()) {
   devtools::install_github("mkearney/rtweet")
 }

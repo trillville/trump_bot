@@ -7,7 +7,7 @@ loadAllTweets <- function(start.date) {
     load("trump_tweets.Rdata")
     current.max.id <- trump.tweets$id[which.max(trump.tweets$created)]
     message("loading new tweets...")
-    z <- get_timeline("realDonaldTrump", n = 3200, since_id = current.max.id) %>%
+    z <- get_timeline("realDonaldTrump", n = 3200, since_id = current.max.id)
       mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
       select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
              id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
@@ -150,8 +150,11 @@ keepModelVars <- function(df, include.label = FALSE) {
 # Make Predictions for all tweets (up to 50) since last.id ---------------------------
 
 predictTweets <- function(last.id) {
-  tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id) %>%
-    mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
+  message("Loading Tweets!")
+  message("Last ID: ", last.id)
+  tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id)
+  messsage("Loaded Tweets: ", nrow(tweets))
+  tweets <- tweets %>% mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
     select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
            id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
            retweeted, longitude = country_code, latitude = place_name)
