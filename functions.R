@@ -174,7 +174,50 @@ predictTweets <- function(last.id) {
   load("model.RData") # load model1
   message("GENERATING PREDICTIONS")
   preds <- predict(model1, model_data, type = "response")
-  out <- data.frame(tweets$id, preds)
+  out <- tibble(tweets$id, preds)
   colnames(out) <- c("id", "prediction")
   return(out)
+}
+
+pct <- function(num) {
+  return(as.integer(min(99, 100 * num)))
+}
+
+probablyNot <- function(percentage) {
+  return(percentage <= 50 && percentage > 0)
+}
+
+notTrumpHimself <- function(percentage) {
+  return(percentage <= 50)
+}
+
+definitelyNot <- function(percentage) {
+  return(percentage == 0)
+}
+
+highConfidence <- function(percentage) {
+  return(percentage > 95 || percentage < 5)
+}
+
+message <- function(pred) {
+  percent <- pct(pred$prediction)
+  url <- paste("https://twitter.com/realDonaldTrump/status/", pred$id, sep = "")
+  msg <- paste(sample(PREFIX_WORDS)[1], "Donald", ifelse(highConfidence(percent), "definitely", "probably"), 
+               ifelse(notTrumpHimself(percent), "had his staff write this,", "wrote this himself,"),
+               ifelse(definitelyNot(percent), "under 1%", paste("a ", percent, "%", sep = "")),
+               paste("chance that it was him", ifelse(highConfidence(percent), "!", "."), sep = ""),
+               sample(SUFFIX_WORDS)[1], url)
+  return(msg)
+}
+
+# Post every tweet in a DF of tweets --------------------------------------
+
+postAllTweets <- function(preds) {
+  if(nrow(preds) == 0) {
+    stop("NO NEW TWEETS - BYE!!!")
+  }
+  for(i in 1:nrow(preds)) {
+    msg <- message(preds[i,])
+    post_tweet(status = msg)
+  }
 }

@@ -7,6 +7,8 @@ last.id <- commandArgs(trailingOnly=TRUE)[1] # "784216198259085312"
 
 predictions <- predictTweets(last.id)
 
+postAllTweets(predictions)
+
 write.csv(predictions, "predictions.csv")
 
 write.csv(predictions)
