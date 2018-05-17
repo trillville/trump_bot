@@ -5,6 +5,7 @@ message(getwd())
 
 last.id <- commandArgs(trailingOnly=TRUE)[1] # "784216198259085312"
 
+retrainModel()
 predictions <- predictTweets(last.id)
 
 postAllTweets(predictions)
