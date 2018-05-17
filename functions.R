@@ -3,7 +3,7 @@
 
 loadAllTweets <- function(start.date) {
   message(list.files())
-  load("trump_tweets.Rdata")
+  trump.tweets <- read_csv("trump_tweets.csv")
   current.max.id <- trump.tweets$id[which.max(trump.tweets$created)]
   message("loading new tweets...")
   z <- get_timeline("realDonaldTrump", n = 3200, since_id = current.max.id)
@@ -16,7 +16,7 @@ loadAllTweets <- function(start.date) {
            id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
            retweeted, longitude = country_code, latitude = place_name)
   trump.tweets <- rbind(trump.tweets, z)
-  save(trump.tweets, file = "trump_tweets.RData")
+  write_csv(trump.tweets, file = "trump_tweets.csv")
   return(trump.tweets)
 }
 
