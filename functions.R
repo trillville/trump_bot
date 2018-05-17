@@ -3,7 +3,7 @@
 
 loadAllTweets <- function(start.date) {
   message(list.files())
-  trump.tweets <- read_csv("trump_tweets.csv")
+  trump.tweets <- read_csv("trump_tweets.csv", guess_max = 10000, col_types = cols(id = col_character()))
   current.max.id <- trump.tweets$id[which.max(trump.tweets$created)]
   message("loading new tweets...")
   z <- get_timeline("realDonaldTrump", n = 3200, since_id = current.max.id)
@@ -118,7 +118,7 @@ addFeatures <- function(df) {
            anticipation = sum(sentiment == "anticipation", na.rm = TRUE),
            num.words    = n())
   
-  trump.dict <- read_csv("trump_dict.csv")
+  trump.dict <- read_csv("trump_dict.csv", guess_max = 10000)
   odds.table <- left_join(all.words, trump.dict) %>%
     group_by(id) %>%
     summarise(user.score = sum(logratio, na.rm = TRUE))
@@ -253,28 +253,43 @@ postAllTweets <- function(preds) {
   }
 }
 
+getClass <- function(text) {
+  if(length(str_which(text, "not-trump")) > 0)
+    trump = 0
+  else if(length(str_which(text, "trump")) > 0)
+    trump = 1
+  else
+    trump = NA
+  return(as.integer(trump))
+}
+
 retrainModel <- function() {
   trump.tweets <- loadAllTweets(START_DATE)
-  classified.tweets <- read_csv("classified.csv")
+  classified.tweets <- read_csv("classified.csv", guess_max = 10000, col_types = cols(id = col_character()))
   
   mentions <- get_mentions(n = 500)
   mentions$trump <- map_int(mentions$text, getClass)
   feedback <- mentions %>%
     filter(!is.na(trump), !is.na(status_quoted_status_id))
   
-  new.training.tweets <- feedback %>%
-    filter(status_quoted_status_id %in% all.tweets$id)
+  new.feedback.tweets <- feedback %>%
+    filter(status_quoted_status_id %in% trump.tweets$id) %>%
+    filter(!status_quoted_status_id %in% classified.tweets$id)
   
-  if(nrow(new.training.tweets) == 0) {
+  if(nrow(new.feedback.tweets) == 0) {
     message("NO NEW TRAINING DATA - BYE!")
     return()
   }
   
-  message(paste("COOL! RETRAINING MODEL!", nrow(new.training.tweets), "NEW LABELED TWEETS"))
+  message(paste("COOL! RETRAINING MODEL!", nrow(new.feedback.tweets), "NEW LABELED TWEETS"))
   
-  training.tweets <- new.training.tweets %>%
+  new.classified.tweets <- new.feedback.tweets %>%
     select(id = status_quoted_status_id, trump) %>%
-    bind_rows(classified.tweets) %>%
+    bind_rows(classified.tweets)
+  
+  write_csv(new.classified.tweets, "classified.csv")
+  
+  training.tweets <- new.classified.tweets %>%
     inner_join(trump.tweets)
   training.tweets <- unique(training.tweets)
   
