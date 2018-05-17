@@ -2,6 +2,7 @@
 # Load all tweets and update local data file ------------------------------------------------------------------------
 
 loadAllTweets <- function(start.date) {
+  message(list.files())
   load("trump_tweets.Rdata")
   current.max.id <- trump.tweets$id[which.max(trump.tweets$created)]
   message("loading new tweets...")
