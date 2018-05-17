@@ -16,7 +16,7 @@ loadAllTweets <- function(start.date) {
            id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
            retweeted, longitude = country_code, latitude = place_name)
   trump.tweets <- rbind(trump.tweets, z)
-  write_csv(trump.tweets, file = "trump_tweets.csv")
+  write_csv(trump.tweets, "trump_tweets.csv")
   return(trump.tweets)
 }
 
@@ -118,7 +118,7 @@ addFeatures <- function(df) {
            anticipation = sum(sentiment == "anticipation", na.rm = TRUE),
            num.words    = n())
   
-  load("trump_dict.RData")
+  trump.dict <- read_csv("trump_dict.csv")
   odds.table <- left_join(all.words, trump.dict) %>%
     group_by(id) %>%
     summarise(user.score = sum(logratio, na.rm = TRUE))
@@ -147,7 +147,7 @@ updateTrumpDict <- function(df, cutoff) {
     arrange(desc(logratio)) %>%
     select(-`0`, -`1`)
   
-  save(trump.dict, file = "trump_dict.RData")
+  write_csv(trump.dict, "trump_dict.csv")
 }
 
 # breaks a data frame of tweets into a data frame of words
