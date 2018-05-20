@@ -25,7 +25,7 @@ db <- src_dbi(db_con)
 db
 ## src:  PqConnection
 ## tbls:
-t <- read_csv("trump_tweets.csv")
+t <-read_csv("trump_tweets.csv", guess_max = 10000, col_types = cols(id = col_character()))
 ids <- t$id
 a <- lookup_statuses(ids)
 b <- read_csv("classified.csv") %>% group_by(id) %>% filter(row_number(id) == 1)
