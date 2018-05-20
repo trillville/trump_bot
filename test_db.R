@@ -28,7 +28,7 @@ db
 t <-read_csv("trump_tweets.csv", guess_max = 10000, col_types = cols(id = col_character()))
 ids <- t$id
 a <- lookup_statuses(ids)
-b <- read_csv("classified.csv") %>% group_by(id) %>% filter(row_number(id) == 1)
+b <- read_csv("classified.csv", guess_max = 10000, col_types = cols(id = col_character())) %>% group_by(id) %>% filter(row_number(id) == 1)
 training_tweets <- a %>% inner_join(b, by = c("status_id" = "id"))
 
 copy_to(db, training_tweets, name="training_tweets", overwrite = TRUE)
