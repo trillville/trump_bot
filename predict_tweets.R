@@ -3,7 +3,7 @@ source("functions.R")
 
 # Update DB?
 message("Trying to update DB")
-source("test_db.R")
+source("test_db")
 
 # Retrain model - capturing any new feedback tweets since the last time the model was retrained
 retrainModel()

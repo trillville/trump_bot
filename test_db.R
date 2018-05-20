@@ -3,10 +3,10 @@
 
 # use the heroku command-line app
 # we do this as the creds change & it avoids disclosure
-config <- run("heroku", c("config:get", "DATABASE_URL", "-a", "tale-of-two-trumps"))
 
-# ^^ gets us a URL, we need the parts
-pg <- httr::parse_url(config$stdout)
+message ("get config")
+
+pg <- httr::parse_url(Sys.getenv("DATABASE_URL"))
 
 # use the parts from ^^
 dbConnect(RPostgres::Postgres(),
