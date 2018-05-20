@@ -41,3 +41,23 @@ if (!"devtools" %in% installed.packages()) {
 if (!"rtweet" %in% installed.packages()) {
   devtools::install_github("mkearney/rtweet")
 }
+
+if (!"processx" %in% installed.packages()) {
+  install.packages("processx", dependencies = TRUE)
+}
+
+if (!"RPostgres" %in% installed.packages()) {
+  install.packages("RPostgres", dependencies = TRUE)
+}
+
+if (!"httr" %in% installed.packages()) {
+  install.packages("httr", dependencies = TRUE)
+}
+
+if (!"dbplyr" %in% installed.packages()) {
+  install.packages("dbplyr", dependencies = TRUE)
+}
+
+if (!"tidyverse" %in% installed.packages()) {
+  install.packages("tidyverse", dependencies = TRUE)
+}

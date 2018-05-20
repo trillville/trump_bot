@@ -1,14 +1,14 @@
-library(dplyr)
-library(purrr)
 library(rtweet)
-library(tidyr)
 library(lubridate)
 library(scales)
-library(stringr)
 library(tidytext)
-library(readr)
 library(gam)
 library(httpuv)
+library(processx)
+library(RPostgres)
+library(httr)
+library(dbplyr)
+library(tidyverse)
 
 # Constants ---------------------------------------------------------------
 
