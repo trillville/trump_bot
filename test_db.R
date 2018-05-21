@@ -6,7 +6,7 @@
 
 message ("get config")
 
-pg <- httr::parse_url(Sys.getenv("DATABASE_URL"))
+pg <- httr::parse_url(config$stdout)
 
 # use the parts from ^^
 dbConnect(RPostgres::Postgres(),
@@ -27,8 +27,11 @@ db
 ## tbls:
 t <-read_csv("trump_tweets.csv", guess_max = 10000, col_types = cols(id = col_character()))
 ids <- t$id
-a <- lookup_statuses(ids)
+#a <- lookup_statuses(ids)
 b <- read_csv("classified.csv", guess_max = 10000, col_types = cols(id = col_character())) %>% group_by(id) %>% filter(row_number(id) == 1)
 training_tweets <- a %>% inner_join(b, by = c("status_id" = "id"))
 
-copy_to(db, training_tweets, name="training_tweets", overwrite = TRUE)
+dbWriteTable(db_con, "training_tweets", training_tweets, overwrite = TRUE)
+
+#copy_to(db, hm, name="hm", overwrite = TRUE)
+#postgresqlBuildTableDefinition(db, "training_tweets", training_tweets)
