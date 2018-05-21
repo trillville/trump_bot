@@ -15,7 +15,7 @@ START_DATE <- as.Date("2016-01-09")
 
 EMOTIONS <- c("trust", "fear", "negative", "sadness", "anger", "surprise", "positive", "disgust", "joy", "anticipation")
 
-MODEL_FEATURES <- c("hour", EMOTIONS, "num.words", "user.score", "has.pic.link")
+MODEL_FEATURES <- c("hour", EMOTIONS, "num.words", "user.score", "has.pic.link", "display_text_width")
 
 PREFIX_WORDS <- c("Low Energy", "Phony", "Dopey", "Neurotic", "Lightweight",  "Goofy", "Crooked", "Lyin'", "Unattractive",
                   "High Energy", "Big League", "Rocket Man", "Cryin'")

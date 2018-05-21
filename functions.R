@@ -1,35 +1,12 @@
 
-# Load all tweets and update local data file ------------------------------------------------------------------------
+# Add features to a data frame of tweets
 
-loadAllTweets <- function(start.date) {
-  trump.tweets <- read_csv("trump_tweets.csv", guess_max = 10000, col_types = cols(id = col_character()))
-  current.max.id <- trump.tweets$id[which.max(trump.tweets$created)]
-  message("loading new tweets...")
-  z <- get_timeline("realDonaldTrump", n = 3200, since_id = current.max.id)
-  if(nrow(z) == 0) {
-    message("NO NEW TWEETS")
-    return(trump.tweets)
-  }
-  z <- z %>% mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
-    select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
-           id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
-           retweeted, longitude = country_code, latitude = place_name)
-  trump.tweets <- rbind(trump.tweets, z)
-  write_csv(trump.tweets, "trump_tweets.csv")
-  return(trump.tweets)
-}
-
-# Add features to a data frame of tweets ------------------------------------------------------------------------
-
-addFeatures <- function(df) {
+addFeatures <- function(df, trump.dict) {
   tweets <- df %>%
-    extract(statusSource, into = "source", regex = "Twitter for (.*?)<") %>%
-    mutate(hour = hour(with_tz(created, "EST")), tweet.date = date(created)) %>%
-    select(-favorited, -favoriteCount, -replyToSN, -truncated, -replyToSID, -replyToUID,
-           -screenName, -retweetCount, -retweeted, -longitude, -latitude)
+    mutate(hour = hour(with_tz(created_at, "EST")), tweet.date = date(created_at))
   
-  tweets$source <- ifelse(is.na(tweets$source), "Other", ifelse(tweets$source != "Android",
-                                                                  "Other", "Android"))
+  tweets$source <- ifelse(tweets$source == "Twitter for Android", "android", 
+                          ifelse(tweets$source == "Twitter for iPhone", "iphone", "other"))
   
   # has.quotes indicates a tweet wrapped in quotation marks 
   tweets$has.quotes <- ifelse(str_detect(tweets$text, c('^"')), 1, 0)
@@ -47,7 +24,7 @@ addFeatures <- function(df) {
   
   sentiment.table<- left_join(all.words, nrc,
                          by = c("word" = "word")) %>%
-    group_by(id) %>%
+    group_by(status_id) %>%
     summarise(trust        = sum(sentiment == "trust", na.rm = TRUE),
            fear         = sum(sentiment == "fear", na.rm = TRUE),
            negative     = sum(sentiment == "negative", na.rm = TRUE),
@@ -60,9 +37,8 @@ addFeatures <- function(df) {
            anticipation = sum(sentiment == "anticipation", na.rm = TRUE),
            num.words    = n())
   
-  trump.dict <- read_csv("trump_dict.csv", guess_max = 10000)
   odds.table <- left_join(all.words, trump.dict) %>%
-    group_by(id) %>%
+    group_by(status_id) %>%
     summarise(user.score = sum(logratio, na.rm = TRUE))
     
   tweets <- left_join(tweets, sentiment.table) %>%
@@ -89,7 +65,7 @@ updateTrumpDict <- function(df, cutoff) {
     arrange(desc(logratio)) %>%
     select(-`0`, -`1`)
   
-  write_csv(trump.dict, "trump_dict.csv")
+  return(trump.dict)
 }
 
 # breaks a data frame of tweets into a data frame of words
@@ -102,79 +78,40 @@ breakOutWords <- function(df, include.source = FALSE) {
     filter(!word %in% stop_words$word, str_detect(word, "[a-z]")) # drop stop words
   
   if (include.source == TRUE) {
-    select(all.words, id, word, trump)
+    select(all.words, status_id, word, trump)
   } else {
-    select(all.words, id, word)
+    select(all.words, status_id, word)
   }
   return(all.words)
-}
-
-keepModelVars <- function(df, include.label = FALSE) {
-  if(include.label == TRUE) {
-    features <- c(MODEL_FEATURES, "trump")
-  } else {
-    features <- MODEL_FEATURES
-  }
-  out <- df %>% select(one_of(features))
-  return(out)
-}
-
-# Get id of last tweet we posted a prediction for
-
-getLastTweet <- function() {
-  tmp <- get_timeline("TwoTrumps", n = 300) %>%
-    filter(!is.na(quoted_status_id) & is.na(mentions_user_id)) %>%
-    arrange(desc(quoted_status_id))
-  return(tmp$quoted_status_id[1])
 }
 
 
 # Make Predictions for all tweets (up to 50) since last.id 
 
-predictTweets <- function(last.id) {
-  message("Loading Tweets!")
-  message("Last ID: ", last.id)
+predictTweets <- function(last.id, model.and.dict, post.tweets = FALSE) {
+  message("Generating predictions!")
   tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id)
   if(nrow(tweets) == 0) {
     stop("NO NEW TWEETS - BYE!!!")
   }
-  message("Loaded Tweets: ", nrow(tweets))
-  tweets <- tweets %>% mutate(favorited = FALSE, retweeted = FALSE, truncated = FALSE) %>%
-    select(text, favorited, favoriteCount = favorite_count, replyToSN = reply_to_screen_name, created = created_at, truncated, replyToSID = reply_to_status_id,
-           id = status_id, replyToUID = reply_to_user_id, statusSource = source, screenName = screen_name, retweetCount = retweet_count, isRetweet = is_retweet,
-           retweeted, longitude = country_code, latitude = place_name)
-  tweets <- addFeatures(tweets)
+  tweets <- tweets %>% select(-urls_url, -urls_t.co, -urls_expanded_url, -media_url, -media_t.co, -media_expanded_url, -media_type,
+                              -mentions_screen_name, -geo_coords, -coords_coords, -bbox_coords, -hashtags, -symbols, -ext_media_url,
+                              -ext_media_t.co, -ext_media_expanded_url, -mentions_user_id)
+  message("Loaded", nrow(tweets), "new tweets")
+  tweets <- addFeatures(tweets, model.and.dict[[1]])
   tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
   model_data <- keepModelVars(tweets)
   
-  load("model.RData") # load model1
   message("GENERATING PREDICTIONS")
-  preds <- predict(model1, model_data, type = "response")
+  preds <- predict(model.and.dict[[2]], model_data, type = "response")
   out <- tibble(tweets$id, preds)
   colnames(out) <- c("id", "prediction")
-  return(out)
+  
+  # Tweet out predictions
+  postAllTweets(out)
 }
 
-pct <- function(num) {
-  return(as.integer(min(99, 100 * num)))
-}
-
-probablyNot <- function(percentage) {
-  return(percentage <= 50 && percentage > 0)
-}
-
-notTrumpHimself <- function(percentage) {
-  return(percentage <= 50)
-}
-
-definitelyNot <- function(percentage) {
-  return(percentage == 0)
-}
-
-highConfidence <- function(percentage) {
-  return(percentage > 95 || percentage < 5)
-}
-
+# Generate the tweet
 getMessage <- function(pred) {
   percent <- pct(pred$prediction)
   url <- paste("https://twitter.com/realDonaldTrump/status/", pred$id, sep = "")
@@ -186,7 +123,7 @@ getMessage <- function(pred) {
   return(msg)
 }
 
-# Post every tweet in a DF of tweets --------------------------------------
+# Post every tweet in a DF of tweets 
 
 postAllTweets <- function(preds) {
   if(nrow(preds) == 0) {
@@ -198,58 +135,45 @@ postAllTweets <- function(preds) {
   }
 }
 
-getClass <- function(text) {
-  if(length(str_which(text, "not-trump")) > 0)
-    trump = 0
-  else if(length(str_which(text, "trump")) > 0)
-    trump = 1
-  else
-    trump = NA
-  return(as.integer(trump))
-}
-
 retrainModel <- function() {
-  trump.tweets <- loadAllTweets(START_DATE)
-  classified.tweets <- read_csv("classified.csv", guess_max = 10000, col_types = cols(id = col_character()))
+  classified.tweets <- readDB("training_tweets") %>% collect()
   
+  # Check for any new training tweets
   mentions <- get_mentions(n = 500)
   mentions$trump <- map_int(mentions$text, getClass)
-  feedback <- mentions %>%
-    filter(!is.na(trump), !is.na(status_quoted_status_id))
+  new.feedback <- mentions %>%
+    select(status_quoted_status_id, trump) %>%
+    filter(!is.na(trump), !is.na(status_quoted_status_id)) %>%
+    filter(!status_quoted_status_id %in% classified.tweets$status_id)
   
-  new.feedback.tweets <- feedback %>%
-    filter(status_quoted_status_id %in% trump.tweets$id) %>%
-    filter(!status_quoted_status_id %in% classified.tweets$id)
-  
-  if(nrow(new.feedback.tweets) == 0) {
-    message("NO NEW TRAINING DATA - BYE!")
-    return()
+  if(nrow(new.feedback) == 0) {
+    message("NO NEW TRAINING DATA!")
+  } else {
+    message(paste("COOL! RETRAINING MODEL!", nrow(new.feedback), "NEW LABELED TWEETS"))
+    new.tweets <- lookup_statuses(new.feedback$status_quoted_status_id) %>%
+      select(-urls_url, -urls_t.co, -urls_expanded_url, -media_url, -media_t.co, -media_expanded_url, -media_type,
+             -mentions_screen_name, -geo_coords, -coords_coords, -bbox_coords, -hashtags, -symbols, -ext_media_url,
+             -ext_media_t.co, -ext_media_expanded_url, -mentions_user_id) %>%
+      inner_join(new.feedback, by = c("status_id" = "status_quoted_status_id"))
+      
+    updateDB("training_tweets", new.tweets, append = TRUE)
+    classified.tweets <- classified.tweets %>%
+      bind_rows(new.tweets)
   }
   
-  message(paste("COOL! RETRAINING MODEL!", nrow(new.feedback.tweets), "NEW LABELED TWEETS"))
+  training.tweets <- unique(classified.tweets)
   
-  new.classified.tweets <- new.feedback.tweets %>%
-    select(id = status_quoted_status_id, trump) %>%
-    bind_rows(classified.tweets)
-  
-  write_csv(new.classified.tweets, "classified.csv")
-  
-  training.tweets <- new.classified.tweets %>%
-    inner_join(trump.tweets)
-  training.tweets <- unique(training.tweets)
-  
-  updateTrumpDict(training.tweets, cutoff = 1)
+  trump.dict <- updateTrumpDict(training.tweets, cutoff = 1)
   
   tweets <- addFeatures(training.tweets)
-  tweets <- tweets[complete.cases(tweets), ]
-  tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
+  tweets <- filter(tweets, has.quotes == 0, is_retweet == FALSE)
   
   tweets <- keepModelVars(tweets, include.label = TRUE)
+  tweets <- tweets[complete.cases(tweets), ]
   
   model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + sadness + anger + 
-                  surprise + positive + disgust + joy + anticipation + num.words + user.score,
+                  surprise + positive + disgust + joy + anticipation + num.words + display_text_width + user.score,
                 family = binomial(),
                 data = tweets)
-  
-  save(model1, file = "model.RData")
+  return(list(trump.dict, model1))
 }
