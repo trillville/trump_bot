@@ -6,7 +6,7 @@
 
 message ("get config")
 
-pg <- httr::parse_url(config$stdout)
+pg <- httr::parse_url(Sys.getenv("DATABASE_URL"))
 
 # use the parts from ^^
 dbConnect(RPostgres::Postgres(),
