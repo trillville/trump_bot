@@ -99,12 +99,12 @@ predictTweets <- function(last.id, model.and.dict, post.tweets = FALSE) {
                               -ext_media_t.co, -ext_media_expanded_url, -mentions_user_id)
   message("Loaded", nrow(tweets), "new tweets")
   tweets <- addFeatures(tweets, model.and.dict[[1]])
-  tweets <- filter(tweets, has.quotes == 0, isRetweet == FALSE)
+  tweets <- filter(tweets, has.quotes == 0, is_retweet == FALSE)
   model_data <- keepModelVars(tweets)
   
   message("GENERATING PREDICTIONS")
   preds <- predict(model.and.dict[[2]], model_data, type = "response")
-  out <- tibble(tweets$id, preds)
+  out <- tibble(tweets$status_id, preds)
   colnames(out) <- c("id", "prediction")
   
   # Tweet out predictions
@@ -165,7 +165,7 @@ retrainModel <- function() {
   
   trump.dict <- updateTrumpDict(training.tweets, cutoff = 1)
   
-  tweets <- addFeatures(training.tweets)
+  tweets <- addFeatures(training.tweets, trump.dict)
   tweets <- filter(tweets, has.quotes == 0, is_retweet == FALSE)
   
   tweets <- keepModelVars(tweets, include.label = TRUE)
