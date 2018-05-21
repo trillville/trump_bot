@@ -171,7 +171,7 @@ retrainModel <- function() {
   tweets <- keepModelVars(tweets, include.label = TRUE)
   tweets <- tweets[complete.cases(tweets), ]
   
-  model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + sadness + anger + 
+  model1 <- gam(trump ~ s(hour, 2) + has.pic.link + trust + fear + negative + sadness + anger + num.words * display_text_width +
                   surprise + positive + disgust + joy + anticipation + num.words + display_text_width + user.score,
                 family = binomial(),
                 data = tweets)
