@@ -1,4 +1,11 @@
 # A Tale of Two Trumps
+
+**May 21 Update: I've made a few modifications to the script!**
+  1) I no longer use `source` as a feature in the model (his device usage pattern changed and it stopped being a reliable feature)
+  2) It's now possible to tweet feedback at the bot! Basically, it's a way to tell the bot that it made a mistake, and/or a way to add more training data! It's pretty simple to do, simply tweet `@TwoTrumps [trump, not-trump] <trump tweet url>`. For example, `@TwoTrumps not-trump https://twitter.com/realDonaldTrump/status/997909163379449857` 
+  3) I switched to the `rtweet` package because it is a bit nicer, and `twitteR` has been deprecated. I also removed all of the ruby code and dependencies, pure R, baby!
+  
+
 Inspired by [Dave Robinson's](https://github.com/dgrtwo/dgrtwo.github.com/blob/master/_R/2016-08-09-trump-tweets.Rmd) great post, we put together a [bot](https://twitter.com/TwoTrumps) that predicts the TRUE author of the many colorful tweets spouting out from the @realdonaldtrump twitter handle. ENJOY!
 
 This program scrapes Donald’s twitter account for any new tweets since the last time it was run, and retweets any original content (retweets and quotes are filtered out), using a simple logistic regression to estimate the probability that he (as opposed to someone from his staff) was the true author. 
