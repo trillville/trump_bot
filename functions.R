@@ -90,8 +90,7 @@ breakOutWords <- function(df, include.source = FALSE) {
 
 predictTweets <- function(last.id, model.and.dict, post.tweets = FALSE) {
   message("Generating predictions!")
-  tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id) %>%
-    filter(!is.na(quoted_status_id) & is.na(mentions_user_id))
+  tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id)
   if(nrow(tweets) == 0) {
     stop("NO NEW TWEETS - BYE!!!")
   }
@@ -101,6 +100,9 @@ predictTweets <- function(last.id, model.and.dict, post.tweets = FALSE) {
   message("Loaded", nrow(tweets), "new tweets")
   tweets <- addFeatures(tweets, model.and.dict[[1]])
   tweets <- filter(tweets, has.quotes == 0, is_retweet == FALSE)
+  if(nrow(tweets) == 0) {
+    stop("NO NEW TWEETS - BYE!!!")
+  }
   model_data <- keepModelVars(tweets)
   
   message("GENERATING PREDICTIONS")

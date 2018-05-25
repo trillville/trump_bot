@@ -20,9 +20,9 @@ keepModelVars <- function(df, include.label = FALSE) {
 # Get id of last tweet we posted a prediction for
 
 getLastTweet <- function() {
-  tmp <- get_timeline("TwoTrumps", n = 300) %>%
+  tmp <- get_timeline("TwoTrumps", n = 50) %>%
     filter(!is.na(quoted_status_id) & is.na(mentions_user_id)) %>%
-    arrange(desc(quoted_status_id))
+    arrange(desc(as.numeric(quoted_status_id)))
   return(tmp$quoted_status_id[1])
 }
 
