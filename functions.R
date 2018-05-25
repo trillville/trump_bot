@@ -90,7 +90,8 @@ breakOutWords <- function(df, include.source = FALSE) {
 
 predictTweets <- function(last.id, model.and.dict, post.tweets = FALSE) {
   message("Generating predictions!")
-  tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id)
+  tweets <- get_timeline("realDonaldTrump", n = 50, since_id = last.id) %>%
+    filter(!is.na(quoted_status_id) & is.na(mentions_user_id))
   if(nrow(tweets) == 0) {
     stop("NO NEW TWEETS - BYE!!!")
   }
